@@ -8,3 +8,9 @@ Edit the Config.json file with your [weather underground API key](https://www.wu
   "State": "YOUR STATE HERE"
 }
 ```
+
+## Not Snowing
+![Not Snowing](https://raw.githubusercontent.com/dannylloyd/IsItSnowing/master/docs/NotSnowing.png)
+
+## Snowing
+![Snowing](https://raw.githubusercontent.com/dannylloyd/IsItSnowing/master/docs/Snowing.png)
