@@ -23,7 +23,6 @@ namespace IsItSnowing
         public const int UpdateInterval = 150000;
 
         public CurrentConditionsWeatherResponse CurrentWeather;
-        public Forecast Forecast;
 
 
         public Form1()
@@ -46,7 +45,6 @@ namespace IsItSnowing
         {           
 
             CurrentWeather = GetCurrentWeather(AppConfig.City, AppConfig.State);
-            Forecast = GetForecast(AppConfig.City, AppConfig.State);
         }
 
         public void CacheCurrentWeather(Models.CurrentConditionsWeatherResponse weather)
@@ -61,12 +59,6 @@ namespace IsItSnowing
             settings.Formatting = Formatting.Indented;
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             return settings;
-        }
-
-        public void CacheForecast(Models.Forecast forecast)
-        {
-            var file = CacheFolder + "\\Forecast.json";
-            System.IO.File.WriteAllText(file, Newtonsoft.Json.JsonConvert.SerializeObject(forecast));
         }
 
         public Models.CurrentConditionsWeatherResponse GetCurrentWeather(string city, string state)
@@ -89,27 +81,6 @@ namespace IsItSnowing
             }
 
             return weather;
-        }
-
-        public Models.Forecast GetForecast(string city, string state)
-        {
-            var cachedFile = new FileInfo(CacheFolder + "\\Forecast.json");
-            Models.Forecast forecast = null;
-            if (cachedFile.Exists && (DateTime.Now - cachedFile.LastWriteTime).TotalSeconds < UpdateInterval)
-            {
-                forecast = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.Forecast>(File.ReadAllText(cachedFile.FullName), JsonSerializerSettings());
-            }
-            else
-            {
-                var client = new System.Net.WebClient {Proxy = {Credentials = CredentialCache.DefaultCredentials}};
-                var weatherJson = client.DownloadString($"{ApiUrl}forecast/q/{state}/{city}.json");
-                forecast = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.Forecast>(weatherJson, JsonSerializerSettings());
-                if (forecast.simpleforecast != null)
-                    CacheForecast(forecast);
-                else
-                    MessageBox.Show($"Forecast returned null, please check your API key, city, or state in the Config.json file. Current API Key: {AppConfig.ApiKey}");                
-            }
-            return forecast;
         }
 
         public void RefreshWeather(BackgroundWorker worker)
